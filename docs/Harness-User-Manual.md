@@ -985,22 +985,22 @@ curl -X POST http://$BENCH:8080/api/human-interaction \
 
 ---
 
-## 15. Driving the bench from Claude
+## 15. Driving the bench from GitHub Copilot
 
-### 15.1 Claude Code skills
+### 15.1 Copilot skills
 
-The repo ships project skills under `.claude/skills/` that teach Claude Code how
-to drive the bench. Install them on each dev machine:
+The repo ships project skills under `.copilot/skills/` that teach GitHub Copilot
+how to drive the bench. Install them on each dev machine:
 
 ```bash
 git clone https://github.com/SensorsIot/Embedded-AI-Harness.git /tmp/uew
-mkdir -p .claude/skills
-cp -r /tmp/uew/.claude/skills/. .claude/skills/
+mkdir -p .copilot/skills
+cp -r /tmp/uew/.copilot/skills/. .copilot/skills/
 rm -rf /tmp/uew
 ```
 
-`.claude/skills/` is project-scoped; use `~/.claude/skills/` to install globally.
-Claude Code loads skills at session start, so restart your session after copying.
+`.copilot/skills/` is project-scoped; use `~/.copilot/skills/` to install
+globally. Restart your Copilot session after copying so the new skill set loads.
 
 | Skill | Covers |
 |-------|--------|
@@ -1022,65 +1022,25 @@ Most `testbench-*` skills assume the bench is at `$BENCH`, or the IP in
 
 ### 15.2 MCP server
 
-`mcp/testbench_mcp.py` exposes the whole HTTP API as **70 MCP tools**, so an MCP
-client can drive the bench conversationally. It's a thin stdio proxy: each tool
-maps 1:1 to an endpoint from a single `SPECS` table. It is **pure Python standard
-library — no `pip install`** — so it runs anywhere Python 3 does.
+`mcp/testbench_mcp.py` exposes the whole HTTP API as **70 MCP tools**, so a
+GitHub Copilot session in VS Code can drive the bench conversationally. It's a
+thin stdio proxy: each tool maps 1:1 to an endpoint from a single `SPECS` table.
+It is **pure Python standard library — no `pip install`** — so it runs anywhere
+Python 3 does.
 
 The server runs on the machine running the MCP client (your laptop), **not** on
 the Pi. It just needs network reach to the bench, pointed by `TESTBENCH_URL`.
 
-**Claude Desktop, one click.** Download
-[`mcp/embedded-ai-harness-testbench.mcpb`](../mcp/embedded-ai-harness-testbench.mcpb),
-then in Claude Desktop go to **Settings → Extensions** and drag the file onto the
-window. When prompted, enter your testbench URL — e.g.
-`http://$BENCH:8080`, or `http://$BENCH:8080` if mDNS resolves.
-You need Python 3 on the machine (macOS has it; on Windows install from
-python.org and tick **Add Python to PATH**).
-
-To point at a different bench later, open the extension's settings and change the
-URL — no reinstall. To update, install a newer `.mcpb` over the old one.
-
-> The bundle is unsigned, so Desktop shows a "not verified" note on install.
-> That's expected for a self-hosted extension; continue.
-
-**Claude Code.**
+To use it from Copilot, register the MCP server in VS Code and set
+`TESTBENCH_URL=http://$BENCH:8080` (or your bench's IP). The server command is:
 
 ```bash
-claude mcp add testbench \
-  --env TESTBENCH_URL=http://$BENCH:8080 \
-  -- python3 /abs/path/to/Embedded-AI-Harness/mcp/testbench_mcp.py
-
-claude mcp list      # look for: testbench … ✔ Connected
+python3 /abs/path/to/Embedded-AI-Harness/mcp/testbench_mcp.py
 ```
 
-Use an **absolute** path. Tools surface as `mcp__testbench__<name>`.
-
-**Claude Desktop, manual config.** **Settings → Developer → Edit Config** opens
-`claude_desktop_config.json` (macOS `~/Library/Application Support/Claude/`,
-Windows `%APPDATA%\Claude\`, Linux `~/.config/Claude/`). Merge in:
-
-```json
-{
-  "mcpServers": {
-    "testbench": {
-      "command": "python3",
-      "args": ["/abs/path/to/Embedded-AI-Harness/mcp/testbench_mcp.py"],
-      "env": { "TESTBENCH_URL": "http://$BENCH:8080" }
-    }
-  }
-}
-```
-
-Then **fully restart** Claude Desktop — quit, not just close the window.
-
-**Rebuilding the bundle** after changing `testbench_mcp.py`:
-
-```bash
-cd mcp
-npx @anthropic-ai/mcpb pack . embedded-ai-harness-testbench.mcpb
-npx @anthropic-ai/mcpb validate manifest.json
-```
+Once configured, Copilot can call the tools as part of chat, agent mode, or a
+workspace workflow. If you are pointing at a different bench later, update the
+`TESTBENCH_URL` environment variable and reload the session.
 
 **Tools by group** — discovery (`testbench_devices/info/log`), flashing (`flash`,
 `ota`, `firmware_list/upload/delete`), serial (`serial_reset/monitor/output/

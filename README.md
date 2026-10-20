@@ -73,7 +73,7 @@ spec true for the product’s whole life.
 
 ## 🧰 What the Harness consists of
 
--   **The method** — four Claude Code skills, one per phase: `/define` (the  
+-   **The method** — four Copilot skills, one per phase: `/define` (the  
     FSD: atomic, falsifiable requirements, each with its verification  
     contract), `/harness` (one-time setup), `/commission` and `/build` (the  
     loop’s driver: test design, the plan, audit, what’s next).
@@ -255,18 +255,17 @@ station = wt.wait_for_station(timeout=30)
 wt.http_get(f"http://{station['ip']}/status")
 ```
 
-## 🤖 Driving It From Claude
+## 🤖 Driving It From GitHub Copilot
 
-An MCP server exposes the whole API as **70 tools**, so Claude Desktop or  
-Claude Code can operate the bench conversationally — “flash this to slot 1  
-and tell me why it’s crashing”. Pure Python standard library, so there’s  
-nothing to `pip install`. For Claude Desktop, drag  
-[`mcp/embedded-ai-harness-testbench.mcpb`](mcp/embedded-ai-harness-testbench.mcpb)  
-onto **Settings → Extensions** and enter your testbench URL.
+An MCP server exposes the whole API as **70 tools**, so GitHub Copilot in VS Code  
+can operate the bench conversationally — “flash this to slot 1 and tell me why  
+it’s crashing”. Pure Python standard library, so there’s nothing to `pip install`.
 
 The AICLP skills (`/define`, `/harness`, `/commission`, `/build`) and the  
-instrument skills all live under `.claude/skills/`. Setup for both:  
-[User Manual §15](docs/Harness-User-Manual.md#15-driving-the-bench-from-claude).
+instrument skills all live under `.copilot/skills/`. Configure the MCP server in  
+VS Code with `TESTBENCH_URL=http://$BENCH:8080`, then use Copilot Chat to drive  
+the bench. Setup details:  
+[User Manual §15](docs/Harness-User-Manual.md#15-driving-the-bench-from-github-copilot).
 
 ## 🩺 Troubleshooting
 
